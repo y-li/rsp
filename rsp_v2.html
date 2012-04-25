@@ -69,16 +69,49 @@
             <div class="row-fluid">
                 <div class="span3 offset1">
                     <p>あなた</p>
-                    <img src="img/rock.png" />
+                    <img id="me" src="img/rock.png" />
                 </div>
                 <div class="span3 offset1">
                     <p>ボブ</p>
-                    <img src="img/scissors.png" />
+                    <img id="bob" src="img/scissors.png" />
                 </div>
             </div>
             <hr />
             <div class="row-fluid">
                 <p id="result" class="offset1">Who will win?</p>
+            </div>
+            <hr />
+            <div class="row-fluid">
+                <p class="offset1">戦績サマリー</p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Win</th>
+                            <th>Lose</th>
+                            <th>Tie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="win">0</td>
+                            <td id="lose">0</td>
+                            <td id="tie">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="offset1">戦績履歴</p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Num</th>
+                            <th>Me</th>
+                            <th>Bob</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history">
+                    </tbody>
+                </table>
             </div>
         </div>
         </div>
@@ -104,21 +137,40 @@
     <script src="js/bootstrap-collapse.js"></script>
     <script src="js/bootstrap-carousel.js"></script>
     <script src="js/bootstrap-typeahead.js"></script>
+    <script src="js/jquery.cookie.js"></script>
 
 <script type="text/javascript">
-    $(".rsp-btn").click(function(){
-        var num = next_rsp();
-        if (num % 2 == 0) {
-            $("#result").text("You win!");
-        } else {
-            $("#result").text("Bob win!");
-        }
+    $(".rsp-btn").click(function() {
+        var hands = {"rock": 0, "scissors": 1, "paper": 2};
+        var sdnah = {0: "rock", 1: "scissors", 2: "paper"};
+        var me = $(this).attr("id");
+        var bob = bobs_hand();
+        var r = fight(hands[me], bob);
+        var results = {0: "Tie!", 1: "You win!", 2: "Bob win!"};
+        $("img#me").attr("src", "img/" + me + ".png");
+        $("img#bob").attr("src", "img/" + sdnah[bob] + ".png");
+        $("#result").text(results[r]);
+        record(me, bob, r);
     });
-    function next_rsp() {
-        var num = Math.floor(Math.random() * 10000);
-        console.log(num);
-        console.log(num % 2);
-        return num;
+    function fight(me, bob) {
+        var results = {"-2": 1, "-1": 2, "0": 0, "1": 1, "2": 2};
+        return results[bob - me];
+    }
+    function bobs_hand() {
+        return Math.floor(Math.random() * 10000) % 3;
+    }
+    function create_record() {
+        var game = $.cookie('game');
+        if (game == null) {
+            // $.cookie('game', '0', {expires: 0});
+            $.cookie('game', 0);
+        }
+    }
+    function record(me, bob, result) {
+        create_record();
+        var game = $.cookie('game');
+        game = game + 1;
+        $("tbody#history").append("<tr><td>" + game + "</td><td></td><td></td><td></td></tr>");
     }
 </script>
 </body>

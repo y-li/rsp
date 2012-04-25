@@ -65,11 +65,11 @@
             <div class="row-fluid">
                 <div class="span3 offset1">
                     <p>あなた</p>
-                    <img src="img/rock.png" />
+                    <img id="me" src="img/rock.png" />
                 </div>
                 <div class="span3 offset1">
                     <p>ボブ</p>
-                    <img src="img/scissors.png" />
+                    <img id="bob" src="img/scissors.png" />
                 </div>
             </div>
             <hr />
@@ -102,19 +102,23 @@
     <script src="js/bootstrap-typeahead.js"></script>
 
 <script type="text/javascript">
-    $(".rsp-btn").click(function(){
-        var num = next_rsp();
-        if (num % 2 == 0) {
-            $("#result").text("You win!");
-        } else {
-            $("#result").text("Bob win!");
-        }
+    $(".rsp-btn").click(function() {
+        var hands = {"rock": 0, "scissors": 1, "paper": 2};
+        var sdnah = {0: "rock", 1: "scissors", 2: "paper"};
+        var me = $(this).attr("id");
+        var bob = bobs_hand();
+        var r = fight(hands[me], bob);
+        var results = {0: "Tie!", 1: "You win!", 2: "Bob win!"};
+        $("img#me").attr("src", "img/" + me + ".png");
+        $("img#bob").attr("src", "img/" + sdnah[bob] + ".png");
+        $("#result").text(results[r]);
     });
-    function next_rsp() {
-        var num = Math.floor(Math.random() * 10000);
-        console.log(num);
-        console.log(num % 2);
-        return num;
+    function fight(me, bob) {
+        var results = {"-2": 1, "-1": 2, "0": 0, "1": 1, "2": 2};
+        return results[bob - me];
+    }
+    function bobs_hand() {
+        return Math.floor(Math.random() * 10000) % 3;
     }
 </script>
 </body>
