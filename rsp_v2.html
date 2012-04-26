@@ -150,7 +150,7 @@
         $("img#me").attr("src", "img/" + me + ".png");
         $("img#bob").attr("src", "img/" + sdnah[bob] + ".png");
         $("#result").text(results[r]);
-        record(me, bob, r);
+        record(me, sdnah[bob], r);
     });
     function fight(me, bob) {
         var results = {"-2": 1, "-1": 2, "0": 0, "1": 1, "2": 2};
@@ -159,18 +159,35 @@
     function bobs_hand() {
         return Math.floor(Math.random() * 10000) % 3;
     }
-    function create_record() {
+    function save_record(result) {
+        var r = {0: "tie", 1: "win", 2: "lose"};
         var game = $.cookie('game');
         if (game == null) {
-            // $.cookie('game', '0', {expires: 0});
-            $.cookie('game', 0);
+            $.cookie("game", 0, {expires: 0});
+            $.cookie("tie", 0, {expires: 0});
+            $.cookie("win", 0, {expires: 0});
+            $.cookie("lose", 0, {expires: 0});
         }
+        game = $.cookie("game");
+        ++game;
+        $.cookie("game", game);
+        var tmp = $.cookie(r[result]);
+        ++tmp;
+        $.cookie(r[result], tmp);
     }
     function record(me, bob, result) {
-        create_record();
+        save_record(result);
+        var r = {0: "tie", 1: "win", 2: "lose"};
         var game = $.cookie('game');
-        game = game + 1;
-        $("tbody#history").append("<tr><td>" + game + "</td><td></td><td></td><td></td></tr>");
+        rec = "<tr>";
+        rec += "<td>" + game + "</td>";
+        rec += "<td>" + me + "</td>";
+        rec += "<td>" + bob + "</td>";
+        rec += "<td>" + r[result] + "</td>";
+        rec += "</tr>";
+        $("tbody#history").prepend(rec);
+        var tmp = $.cookie(r[result]);
+        $("#" + r[result]).text(tmp);
     }
 </script>
 </body>
