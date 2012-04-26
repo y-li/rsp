@@ -143,24 +143,23 @@
     $(".rsp-btn").click(function() {
         var hands = {"rock": 0, "scissors": 1, "paper": 2};
         var sdnah = {0: "rock", 1: "scissors", 2: "paper"};
+        var msg = {"tie": "Tie!", "win": "You win!", "lose": "Bob win!"};
         var me = $(this).attr("id");
         var bob = bobs_hand();
         var r = fight(hands[me], bob);
-        var results = {0: "Tie!", 1: "You win!", 2: "Bob win!"};
         $("img#me").attr("src", "img/" + me + ".png");
         $("img#bob").attr("src", "img/" + sdnah[bob] + ".png");
-        $("#result").text(results[r]);
+        $("#result").text(msg[r]);
         record(me, sdnah[bob], r);
     });
     function fight(me, bob) {
-        var results = {"-2": 1, "-1": 2, "0": 0, "1": 1, "2": 2};
-        return results[bob - me];
+        var result_table = {"-2": "win", "-1": "lose", "0": "tie", "1": "win", "2": "lose"};
+        return result_table[bob - me];
     }
     function bobs_hand() {
         return Math.floor(Math.random() * 10000) % 3;
     }
     function save_record(result) {
-        var r = {0: "tie", 1: "win", 2: "lose"};
         var game = $.cookie('game');
         if (game == null) {
             $.cookie("game", 0, {expires: 0});
@@ -171,23 +170,22 @@
         game = $.cookie("game");
         ++game;
         $.cookie("game", game);
-        var tmp = $.cookie(r[result]);
+        var tmp = $.cookie(result);
         ++tmp;
-        $.cookie(r[result], tmp);
+        $.cookie(result, tmp);
     }
     function record(me, bob, result) {
         save_record(result);
-        var r = {0: "tie", 1: "win", 2: "lose"};
         var game = $.cookie('game');
+        var tmp = $.cookie(result);
+        $("#" + result).text(tmp);
         rec = "<tr>";
         rec += "<td>" + game + "</td>";
         rec += "<td>" + me + "</td>";
         rec += "<td>" + bob + "</td>";
-        rec += "<td>" + r[result] + "</td>";
+        rec += "<td>" + result + "</td>";
         rec += "</tr>";
         $("tbody#history").prepend(rec);
-        var tmp = $.cookie(r[result]);
-        $("#" + r[result]).text(tmp);
     }
 </script>
 </body>
