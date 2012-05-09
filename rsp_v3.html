@@ -74,20 +74,59 @@
                 <button type="button" class="btn rsp-btn" id="scissors">チョキ</button>
                 <button type="button" class="btn rsp-btn" id="paper">パー</button>
             </div>
+            <div class="row-fluid">
+                <input type="radio" name="enemy-name" class="enemy-name" value="ボブ" checked="checked"/>ボブ
+                <input type="radio" name="enemy-name" class="enemy-name" value="アドルフ"/>アドルフ
+                <input type="radio" name="enemy-name" class="enemy-name" value="クラーク"/>クラーク
+                <input type="radio" name="enemy-name" class="enemy-name" value="ダドリー"/>ダドリー
+            </div>
             <hr />
             <div class="row-fluid">
                 <div class="span3 offset1">
                     <p>あなた</p>
-                    <img src="img/rock.png" />
+                    <img id="me" src="img/rock.png" />
                 </div>
                 <div class="span3 offset1">
-                    <p>ボブ</p>
-                    <img src="img/scissors.png" />
+                    <p id="enemy">ボブ</p>
+                    <img id="enemy" src="img/scissors.png" />
                 </div>
             </div>
             <hr />
             <div class="row-fluid">
                 <p id="result" class="offset1">Who will win?</p>
+            </div>
+            <hr />
+            <div class="row-fluid">
+                <p class="offset1">戦績サマリー</p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Win</th>
+                            <th>Lose</th>
+                            <th>Tie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="win">0</td>
+                            <td id="lose">0</td>
+                            <td id="tie">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="offset1">戦績履歴</p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Num</th>
+                            <th>Me</th>
+                            <th>Enemy</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history">
+                    </tbody>
+                </table>
             </div>
         </div>
         </div>
@@ -113,21 +152,89 @@
     <script src="js/bootstrap-collapse.js"></script>
     <script src="js/bootstrap-carousel.js"></script>
     <script src="js/bootstrap-typeahead.js"></script>
+    <script src="js/jquery.cookie.js"></script>
 
 <script type="text/javascript">
-    $(".rsp-btn").click(function(){
-        var num = next_rsp();
-        if (num % 2 == 0) {
-            $("#result").text("You win!");
-        } else {
-            $("#result").text("Bob win!");
-        }
+    $(".enemy-name").click(function() {
+        var enemy_name = $(this).attr("value");
+        $("#enemy").text(enemy_name);
     });
-    function next_rsp() {
-        var num = Math.floor(Math.random() * 10000);
-        console.log(num);
-        console.log(num % 2);
-        return num;
+    $(".rsp-btn").click(function() {
+        var hands = {"rock": 0, "scissors": 1, "paper": 2};
+        var sdnah = {0: "rock", 1: "scissors", 2: "paper"};
+        var msg = {"tie": "Tie!", "win": "You win!", "lose": "Enemy win!"};
+        var me = $(this).attr("id");
+        var enemy_name = $('input:radio[name=enemy-name]:checked').val();
+        switch (enemy_name) {
+            case 'ボブ':
+                var enemy = bobs_hand();
+                break;
+            case 'アドルフ':
+                var enemy = adolfs_hand();
+                break;
+            case 'クラーク':
+                var enemy = clarks_hand();
+                break;
+            case 'ダドリー':
+                var enemy = dudleys_hand();
+                break;
+        }
+        var r = fight(hands[me], enemy);
+        $("img#me").attr("src", "img/" + me + ".png");
+        $("img#enemy").attr("src", "img/" + sdnah[enemy] + ".png");
+        $("#result").text(msg[r]);
+        record(me, sdnah[enemy], r);
+    });
+    function fight(me, enemy) {
+        var result_table = {"-2": "win", "-1": "lose", "0": "tie", "1": "win", "2": "lose"};
+        return result_table[enemy - me];
+    }
+    function bobs_hand() {
+        return Math.floor(Math.random() * 10000) % 3;
+    }
+    function adolfs_hand() {
+        return 0;
+    }
+    function clarks_hand() {
+        var tmp = Math.floor(Math.random() * 10000) % 100;
+        if (tmp < 50) {
+            return 1;
+        } else if (tmp < 75) {
+            return 0;
+        } else {
+            return 2;
+        }
+    }
+    function dudleys_hand() {
+        return 2;
+    }
+    function save_record(result) {
+        var game = $.cookie('game');
+        if (game == null) {
+            $.cookie("game", 0, {expires: 0});
+            $.cookie("tie", 0, {expires: 0});
+            $.cookie("win", 0, {expires: 0});
+            $.cookie("lose", 0, {expires: 0});
+        }
+        game = $.cookie("game");
+        ++game;
+        $.cookie("game", game);
+        var tmp = $.cookie(result);
+        ++tmp;
+        $.cookie(result, tmp);
+    }
+    function record(me, enemy, result) {
+        save_record(result);
+        var game = $.cookie('game');
+        var tmp = $.cookie(result);
+        $("#" + result).text(tmp);
+        rec = "<tr>";
+        rec += "<td>" + game + "</td>";
+        rec += "<td>" + me + "</td>";
+        rec += "<td>" + enemy + "</td>";
+        rec += "<td>" + result + "</td>";
+        rec += "</tr>";
+        $("tbody#history").prepend(rec);
     }
 </script>
 </body>
